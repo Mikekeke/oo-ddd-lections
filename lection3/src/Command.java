@@ -1,3 +1,5 @@
+import java.util.Optional;
+
 abstract class Command{
     protected static Lines lines;
     public static void setLines(Lines exlines){
@@ -8,11 +10,12 @@ abstract class Command{
 }
 
 class InsertLine extends Command{
+    Optional idx = Optional.empty();
 
     @Override
     public void execute(String line, int n, int m){
 
-        lines.insert(line,n);
+        lines.insert(line, n);
     }
 
     @Override
