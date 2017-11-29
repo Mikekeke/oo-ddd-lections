@@ -1,0 +1,371 @@
+
+1. В интегрированной среде создать новый проект Java;
+в папке с исходниками создать новый пакет, например meyer_03;
+в пакете создать 3 класса Lines, Command и Applic.
+Класс Applic содержит входную точку приложения и является
+"текстовым редактором":
+
+Работа с текстовым редактором выглядит следующим образом:
+
+====================================================
+XXXXXX XXX XXXXXXXXXXXX XX XXXXXX
+XXX XXXXX XXXXXXX XX XXXX
+XXX XXXXXX XXX XXXX XXXX
+XXXXX XXXX X XXX XX XXXXXXXX XXX
+XXX XXXX XXXX XXXXX
+
+
+
+Commands:
+Insert Line IL:s:n, Append Line AL:s:, Replace Line RL:s:n, Delete Line DL::n
+Insert Word IW:w:n:m, Append Word AW:w:n:, Replace Word RW:w:n:m, Delete Word DW::n:m
+undo U, redo R, quit Q
+
+где s - строка
+    n - номер строки
+    m - номер слова в заданной строке
+
+Например команда
+
+AL:возможность отмены и повтора команд очень важна в интеративных системах:
+
+Добавит строку в конец имеющегося текста, при наличии свободного места.
+
+а
+
+DL::5
+
+Удалит строку номер 5, а оставшиеся, если есть, сдвинет вверх.
+
+Замечание: поскольку данный "текстовый редактор" предназначен не для редактирования 
+текстов, а для изучения отмены и повтора команд в интерактивных системах в качестве
+простой и наглядной иллюстрации, то количество строк в редактируемом тексте ограничено
+и команды вводятся в нижней части экрана. (Те, кого не устраивает такой "текстовый редактор",
+могут написать свою реализацию vi).
+
+В простейшей первоначальной редакции класс Applic(реализованы только операции со
+строками) позволяет выполнять отмену и повторное выполнение только последней команды
+и имеет вид:
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
+
+public class Applic {
+    Lines lines;
+    private BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
+    
+    public Applic(int N){
+        lines = new Lines(N);
+    }
+    
+    public void exec() throws IOException {
+        String[] args = null;
+        Command cmd=null;
+        Command.setLines(lines);
+        String ln="";
+        int n=0;
+        int m=0;
+        do {
+            System.out.println("====================================================");
+            for(String s:lines.lines){
+                System.out.println(s);
+            }
+            System.out.println("Commands:\nInsert Line IL:s:n, Append Line AL:s:, Replace Line RL:s:n, Delete Line DL::n\n"
+            +"Insert Word IW:w:n:m, Append Word AW:w:n:, Replace Word RW:w:n:m, Delete Word DW::n:m\n"
+            + "undo U, redo R, quit Q");
+            String command = bf.readLine();
+            args = command.split(":");
+            n=0;
+            m=0;
+            ln="";
+            try {
+                ln = args[1];
+                n = Integer.valueOf(args[2]);
+                m = Integer.valueOf(args[3]);
+            }
+            catch(Exception e){
+                
+            }
+            
+            //Единственная точка выбора в проекте - if'ы здесь допустимы
+            if (args[0].compareTo("IL") == 0) {
+                cmd = new InsertLine();
+                cmd.execute(ln, n, m);
+                continue;
+            }
+            
+            if (args[0].compareTo("AL") == 0) {
+                cmd = new AppendLine();
+                cmd.execute(ln, n, m);
+                continue;
+            }
+            
+            if (args[0].compareTo("RL") == 0) {
+                cmd = new ReplaceLine();
+                cmd.execute(ln, n, m);
+                continue;
+            }
+            
+            if (args[0].compareTo("DL") == 0) {
+                cmd = new DeleteLine();
+                cmd.execute(ln, n, m);
+                continue;
+            }
+            
+            if (args[0].compareTo("U") == 0) {
+                if(cmd!=null)
+                    cmd.undo();
+                continue;
+            }
+            
+            if (args[0].compareTo("R") == 0) {
+                if(cmd!=null)
+                    cmd.execute(ln, n, m);
+                continue;
+            }
+            
+            if (args[0].compareTo("Q") == 0) {
+                break;
+            }
+            System.out.println("Неверная команда");
+        } while(true);
+    }
+    
+    public static void main(String[] args) throws IOException {
+        // TODO code application logic here
+        Applic m3 = new Applic(8);
+        m3.exec();
+    }
+}
+
+
+Класс Lines содержит редактируемый текст и в данном случае содержит только операции
+со строками:
+
+public class Lines {
+    protected String[] lines;
+    protected int nLines;
+    protected int cl;
+    
+    public Lines(int nLines) {
+        this.nLines = nLines;
+        lines = new String[nLines];
+        for(int i=0;i<nLines;i++){
+            lines[i] = "";
+        }
+        cl=0;
+    }
+    
+    public void insert(String line, int n){
+        if(cl > n){
+            for(int j=nLines-1;j>n;j--){
+                lines[j]=lines[j-1];
+            }
+            lines[n]=line;
+            if(cl<nLines-1)cl++;
+        }
+        else System.out.println("n must be between 0 and "+(cl-1));
+    }
+    
+    public void append(String line){
+        if(cl < nLines){
+            lines[cl]=line;
+            cl++;
+        }
+        else System.out.println("There is not enough room");
+    }
+    
+    public void replace(String line, int n){
+        if(cl > n){
+            lines[n]=line;
+        }
+        else System.out.println("n must be between 0 and "+(cl-1));
+    }
+    
+    public void delete(int n){
+        if(cl > n){
+            for(int j=n; j<nLines-1;j++){
+                lines[j]=lines[j+1];
+            }
+            cl--;
+            lines[cl]="";
+        }
+        else System.out.println("n must be between 0 and "+(cl-1));
+    }
+}
+
+И, наконец, иерархия классов Command, содержащая в качестве статического поля
+ссылку на редактируемый текст, и которая приведена не полностью.
+Предлагается для каждой команды, т.е в классе-наследнике Command, определить,
+что нужно запомнить для реализации undo и реализовать сам метод undo:
+
+abstract class Command{
+    protected static Lines lines;
+    public static void setLines(Lines exlines){
+        lines = exlines;
+    }
+    abstract public void execute(String line, int n, int m);
+    abstract public void undo();
+}
+
+class InsertLine extends Command{
+    
+    @Override
+    public void execute(String line, int n, int m){
+        
+        lines.insert(line,n);
+    }
+    
+    @Override
+    public void undo() {
+        
+    }
+}
+
+class AppendLine extends Command{
+    
+    @Override
+    public void execute(String line, int n, int m){
+        
+        lines.append(line);
+    }
+    @Override
+    public void undo() {
+        
+    }
+}
+
+class ReplaceLine extends Command{
+
+    @Override
+    public void execute(String line, int n, int m){
+
+        lines.replace(line,n);
+    }
+    @Override
+    public void undo() {
+        
+    }
+}
+
+class DeleteLine extends Command{
+
+    @Override
+    public void execute(String line, int n, int m){
+        
+        lines.delete(n);
+    }
+    @Override
+    public void undo() {
+        
+    }
+}
+
+Дополнить классы команд требуемой информаций, собрать проект, запустить на
+исполнение и проверить его работу.
+
+2. Большое количество инструкций условного перехода в методе exec класса Applic
+является допустимым, так как является единственной точкой входа. Т.е. код всего
+приложения может содержать только один участок с многочисленными if'ами - else'ами.
+Но такой код воспринимается плохо и соотвественно плохо редактируется и расширяется.
+В тех случаях, когда в зависимости от ситуации создаются разнообразные объекты из 
+единой иерархии, код заметно улучшается, если использовать фабрику классов.
+Например, на Java с использованием параметризированных классов можно создать
+класс-фабрику универсального назначения при условии, что все порождаемые объекты
+основаны на классах, имеющих конструктор по умолчанию.
+
+class XFactory<K,E>{
+    private TreeMap<K,E> map;
+    public XFactory(TreeMap<K,E> map){
+        this.map = map;
+    }
+    public E getObject(K key) throws IllegalAccessException, InstantiationException {
+        E e = map.get(key);
+        if(e==null) return null;
+        return (E) e.getClass().newInstance();
+    }
+}
+
+Для использования данной фабрики необходимо создать и заполнить словарь, ключи которых
+определяют типы создаваемых объектов, а значения - сами объекты.
+В Java помимо оператора new новый объект можно создать при помощи метода newInstance().
+
+Например в нашем случае экземпляры классов InsertLine, AppendLine, DeleteLine и ReplaceLine,
+а при расширении возможностей "текстового редактора" также и экземпляры классов InsertWord, 
+AppendWord, DeleteWord и ReplaceWord и даже InsertLetter, AppendLetter, DeleteLetter и 
+ReplaceLetter - можно создавать следующим образом:
+
+protected XFactory<String,Command> fact;
+protected TreeMap<String,Command> cmdMap;
+
+...............................................
+
+
+cmdMap=new TreeMap<String,Command>();
+cmdMap.put("AL", new AppendLine());
+cmdMap.put("IL", new InsertLine());
+cmdMap.put("DL", new DeleteLine());
+cmdMap.put("RL", new ReplaceLine());
+fact = new XFactory<String,Command>(cmdMap);
+
+...............................................
+
+String command = bf.readLine();
+args = command.split(":");
+
+...............................................
+
+try {
+    cmd = fact.getObject(args[0]);
+}
+catch(Exception e){
+    System.out.println(e.getMessage());
+    continue;
+}
+
+if(cmd!=null){
+    n=0;
+    m=0;
+    ln="";
+    try {
+        ln = args[1];
+        n = Integer.valueOf(args[2]);
+        m = Integer.valueOf(args[3]);
+    }
+    catch(Exception e){
+        
+    }
+    cmd.execute(ln, n, m);
+    continue;
+}
+
+Понятно, что инструкции U, R и Q фабрикой классов не обрабатываются и по прежнему
+являются уделом if'ов. Но последних в коде становится заметно меньше.
+
+Переработать код класса Applic, так чтобы он использовал фабрику классов для
+порождения объектов-команд и имел возможность выполнить undo-redo последней
+команды.
+
+3. Возможности "текстового редактора" заметно расширяются, если использовать
+историю объектов-команд вместе с параметрами в виде очереди с методами:
+  put - добавить команду вместе с параметрами;
+  item - вернуть текущую команду вместе с параметрами;
+  back - переместить текующую позицию на один шаг назад;
+  forth - переместить текующую позицию на один шаг вперед;
+  is_first - является ли текущий элемент первым;
+  is_last - является ли текущий элемент последним;
+  is_empty - является ли очередь команд пустой;
+  remove_right - удалить все команды справа от текущей позиции, т.е. команда в текущей
+  позиции становится последней.
+  
+  Реализовать очередь на основе generic'а ArrayList<> и проверить работу программы.
+  
+4. Переработаь очередь так, чтобы она была реализована на основе массива конечного размера,
+образующего циклический буфер.
+
+  Проверить работу программы.
+  
+5. Реализовать пункты 1-4 или на языке Python или на другом языке по вашему выбору.
+
