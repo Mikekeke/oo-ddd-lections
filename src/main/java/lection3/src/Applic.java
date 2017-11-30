@@ -1,81 +1,70 @@
 package lection3.src;
 
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.TreeMap;
 
 public class Applic {
     Lines lines;
     private BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
+    protected XFactory<String, Command> fact;
 
-    public Applic(int N){
+    public Applic(int N) {
         lines = new Lines(N);
+        TreeMap<String, Command> cmdMap = new TreeMap<String, Command>();
+        cmdMap.put("AL", new AppendLine());
+        cmdMap.put("IL", new InsertLine());
+        cmdMap.put("DL", new DeleteLine());
+        cmdMap.put("RL", new ReplaceLine());
+        fact = new XFactory<>(cmdMap);
     }
 
     public void exec() throws IOException {
         String[] args = null;
-        Command cmd=null;
+        Command cmd = null;
         Command.setLines(lines);
-        String ln="";
-        int n=0;
-        int m=0;
+        String ln = "";
+        int n = 0;
+        int m = 0;
         do {
             System.out.println("====================================================");
-            for(String s:lines.lines){
+            for (String s : lines.lines) {
                 System.out.println(s);
             }
             System.out.println("Commands:\nInsert Line IL:s:n, Append Line AL:s:, Replace Line RL:s:n, Delete Line DL::n\n"
-                    +"Insert Word IW:w:n:m, Append Word AW:w:n:, Replace Word RW:w:n:m, Delete Word DW::n:m\n"
+                    + "Insert Word IW:w:n:m, Append Word AW:w:n:, Replace Word RW:w:n:m, Delete Word DW::n:m\n"
                     + "undo U, redo R, quit Q");
             String command = bf.readLine();
             args = command.split(":");
-            n=0;
-            m=0;
-            ln="";
+            n = 0;
+            m = 0;
+            ln = "";
             try {
                 ln = args[1];
                 n = Integer.valueOf(args[2]);
                 m = Integer.valueOf(args[3]);
-            }
-            catch(Exception e){
+            } catch (Exception e) {
 
             }
 
-            //Единственная точка выбора в проекте - if'ы здесь допустимы
-            if (args[0].compareTo("IL") == 0) {
-                cmd = new InsertLine();
-                cmd.execute(ln, n, m);
-                continue;
-            }
-
-            if (args[0].compareTo("AL") == 0) {
-                cmd = new AppendLine();
-                cmd.execute(ln, n, m);
-                continue;
-            }
-
-            if (args[0].compareTo("RL") == 0) {
-                cmd = new ReplaceLine();
-                cmd.execute(ln, n, m);
-                continue;
-            }
-
-            if (args[0].compareTo("DL") == 0) {
-                cmd = new DeleteLine();
+            Command fCmd = fact.getOrNull(args[0]);
+            if (fCmd != null) {
+                cmd = fCmd;
                 cmd.execute(ln, n, m);
                 continue;
             }
 
             if (args[0].compareTo("U") == 0) {
-                if(cmd!=null) {
+                if (cmd != null) {
                     cmd.undo();
                 }
-
                 continue;
             }
 
             if (args[0].compareTo("R") == 0) {
-                if(cmd!=null)
+                if (cmd != null)
                     cmd.execute(ln, n, m);
                 continue;
             }
@@ -84,11 +73,10 @@ public class Applic {
                 break;
             }
             System.out.println("Неверная команда");
-        } while(true);
+        } while (true);
     }
 
     public static void main(String[] args) throws IOException {
-        // TODO code application logic here
         Applic m3 = new Applic(8);
         m3.exec();
     }

@@ -16,6 +16,7 @@ class InsertLine extends Command {
     private String insLine;
     private int idx = -1;
 
+
     @Override
     public void execute(String line, int n, int m) {
         insLine = insLine == null ? line : insLine;
