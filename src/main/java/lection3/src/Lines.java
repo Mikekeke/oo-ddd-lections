@@ -1,3 +1,5 @@
+package lection3.src;
+
 public class Lines {
     protected String[] lines;
     protected int nLines;

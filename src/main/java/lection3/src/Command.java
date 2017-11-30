@@ -1,4 +1,4 @@
-import java.util.Optional;
+package lection3.src;
 
 abstract class Command {
     protected static Lines lines;
@@ -13,15 +13,14 @@ abstract class Command {
 }
 
 class InsertLine extends Command {
-    String _line;
+    String insLine;
     int idx = -1;
 
     @Override
     public void execute(String line, int n, int m) {
-        String toInsert = line.isEmpty() ? _line : line;
-        lines.insert(toInsert, n);
-        idx = n;
-        _line = line;
+        insLine = insLine == null ? line : insLine;
+        idx = idx == -1 ? n : idx;
+        lines.insert(insLine, idx);
     }
 
     @Override
@@ -29,16 +28,16 @@ class InsertLine extends Command {
         if (idx >= 0) {
             lines.delete(idx);
         }
-
     }
 }
 
 class AppendLine extends Command {
+    String appLine;
 
     @Override
     public void execute(String line, int n, int m) {
-
-        lines.append(line);
+        appLine = appLine == null ? line : appLine;
+        lines.append(appLine);
     }
 
     @Override
@@ -48,38 +47,40 @@ class AppendLine extends Command {
 }
 
 class ReplaceLine extends Command {
+    String oldLine, newLine;
+    int idx = -1;
 
     @Override
     public void execute(String line, int n, int m) {
-
-        lines.replace(line, n);
+        idx = idx == -1 ? n : idx;
+        oldLine = oldLine == null ? lines.lines[idx] : oldLine;
+        newLine = newLine == null ? line : newLine;
+        lines.replace(newLine, idx);
     }
 
     @Override
     public void undo() {
-
+        lines.replace(oldLine, idx);
     }
 }
 
 class DeleteLine extends Command {
-    private String _line;
-    private int idx;
+    private String delLine;
+    private int idx = -1;
 
     @Override
     public void execute(String line, int n, int m) {
-        _line = lines.lines[n];
-        idx = n;
-
-        lines.delete(n);
+        delLine = delLine == null ? lines.lines[n] : delLine;
+        idx = idx == -1 ? n : idx;
+        lines.delete(idx);
     }
 
     @Override
     public void undo() {
-        if (lines.cl == 0) {
-            lines.append(_line);
+        if (idx == lines.cl) {
+            lines.append(delLine);
         } else {
-            lines.insert(_line, idx);
+            lines.insert(delLine, idx);
         }
-
     }
 }
