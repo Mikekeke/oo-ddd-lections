@@ -3,6 +3,10 @@ public class Lines {
     protected int nLines;
     protected int cl;
 
+    public int lastLine() {
+        return cl - 1;
+    }
+
     public Lines(int nLines) {
         this.nLines = nLines;
         lines = new String[nLines];

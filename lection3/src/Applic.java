@@ -65,8 +65,10 @@ public class Applic {
             }
 
             if (args[0].compareTo("U") == 0) {
-                if(cmd!=null)
+                if(cmd!=null) {
                     cmd.undo();
+                }
+
                 continue;
             }
 
