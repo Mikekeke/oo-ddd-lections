@@ -13,8 +13,8 @@ abstract class Command {
 }
 
 class InsertLine extends Command {
-    String insLine;
-    int idx = -1;
+    private String insLine;
+    private int idx = -1;
 
     @Override
     public void execute(String line, int n, int m) {
@@ -32,7 +32,7 @@ class InsertLine extends Command {
 }
 
 class AppendLine extends Command {
-    String appLine;
+    private String appLine;
 
     @Override
     public void execute(String line, int n, int m) {
@@ -47,8 +47,8 @@ class AppendLine extends Command {
 }
 
 class ReplaceLine extends Command {
-    String oldLine, newLine;
-    int idx = -1;
+    private String oldLine, newLine;
+    private int idx = -1;
 
     @Override
     public void execute(String line, int n, int m) {
