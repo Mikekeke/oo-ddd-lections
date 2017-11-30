@@ -4,12 +4,21 @@ package lection3.src;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.TreeMap;
+
+class NoComandException extends Exception {
+    public NoComandException(String message) {
+        super(message);
+    }
+}
+
 
 public class Applic {
     Lines lines;
     private BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
     protected XFactory<String, Command> fact;
+    protected CommandsQ cq;
 
     public Applic(int N) {
         lines = new Lines(N);
@@ -19,6 +28,7 @@ public class Applic {
         cmdMap.put("DL", new DeleteLine());
         cmdMap.put("RL", new ReplaceLine());
         fact = new XFactory<>(cmdMap);
+        cq = new CommandsQ(4);
     }
 
     public void exec() throws IOException {
@@ -52,20 +62,26 @@ public class Applic {
             Command fCmd = fact.getOrNull(args[0]);
             if (fCmd != null) {
                 cmd = fCmd;
+                cq.addC(fCmd);
                 cmd.execute(ln, n, m);
                 continue;
             }
 
             if (args[0].compareTo("U") == 0) {
-                if (cmd != null) {
-                    cmd.undo();
+                try {
+                    cq.getToUndo().undo();
+                } catch (NoComandException e) {
+                    System.err.println(e.getMessage());
                 }
                 continue;
             }
 
             if (args[0].compareTo("R") == 0) {
-                if (cmd != null)
-                    cmd.execute(ln, n, m);
+                try {
+                    cq.getToRedo().execute(ln, n, m);
+                } catch (NoComandException e) {
+                    System.err.println(e.getMessage());
+                }
                 continue;
             }
 
