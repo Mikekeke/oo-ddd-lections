@@ -1,5 +1,8 @@
 package lection2;
 
+import java.util.Map;
+import java.util.TreeMap;
+
 public class Application {
     private State[] states; // ассоциативнывй массив состояний
     private int[][] trans;  // таблица переходов между состояниями
@@ -39,12 +42,25 @@ public class Application {
 //        } while (choice != final_st);
 //    }
 
+    private Map<Integer,String> consTransitions(int[] possibleTrs){
+        Map<Integer,String> map = new TreeMap<>();
+        for(int i:possibleTrs){
+            State s = states[i];
+            if (s == null){
+                map.put(i, "Выход");
+            } else {
+                map.put(i, s.toString());
+            }
+        }
+        return map;
+    }
+
     public void execute() throws Exception {
         int choice = initial_st;
         int back = initial_st;
         do {
             State state = states[choice];
-            state.execute(back);
+            state.execute(back, consTransitions(state.getTransitions()));
             back = choice;
             choice = state.getChoice();
         } while (choice != final_st);

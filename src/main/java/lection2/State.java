@@ -3,6 +3,7 @@ package lection2;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Map;
 
 class Answer{
 
@@ -18,6 +19,10 @@ abstract class State{
 
     public void setTransitions(int[] transitions) {
         this.transitions= transitions;
+    }
+
+    public int[] getTransitions(){
+        return transitions;
     }
 
 
@@ -52,7 +57,14 @@ abstract class State{
         //исключающих недопустимый выбор
     }
 
-    public void execute(int prevState) throws IOException{
+    public void printTrs(Map<Integer,String> trs){
+        for(Map.Entry<Integer, String> e : trs.entrySet()){
+            System.out.print(e.getKey() + " " + e.getValue() + "  ");
+
+        }
+    }
+
+    public void execute(int prevState, Map<Integer,String> trs) throws IOException{
         history = prevState;
         boolean res;
         display();
@@ -62,6 +74,7 @@ abstract class State{
             if (!res) message();
         }while(!res);
         process();
+        printTrs(trs);
         makeChoice();
     }
 
@@ -79,7 +92,10 @@ class Register extends State{
         System.out.println("пароль   ХХХХХХХХХ");
         System.out.println();System.out.println();
         System.out.println();System.out.println();
-        System.out.println("7 Помощь   2 Выбор рейса  5 Подтвержение 0 Выход");
+    }
+    @Override
+    public String toString() {
+        return "Регистрация";
     }
 }
 
@@ -101,6 +117,11 @@ class Help extends State{
     @Override
     public int getChoice() {
         return history;
+    }
+
+    @Override
+    public String toString() {
+        return "Помощь";
     }
 }
 
@@ -135,7 +156,11 @@ class Flights extends State{
         System.out.println("3 ХХХХХ    ХХ.ХХ.ХХ ХХ:ХХ       ХХ.ХХ.ХХ ХХ:ХХ");
         System.out.println("4 ХХХХХ    ХХ.ХХ.ХХ ХХ:ХХ       ХХ.ХХ.ХХ ХХ:ХХ");
         System.out.println();System.out.println();
-        System.out.println("6 Помощь   3 Выбор мест  1 Начальный экран 0 Выход");
+    }
+
+    @Override
+    public String toString() {
+        return "Вылеты";
     }
 }
 
@@ -150,7 +175,11 @@ class Seats extends State{
         System.out.println(" Эконом   $XXXX      XX");
         System.out.println(" Бизнес   $XXXX      XX");
         System.out.println();System.out.println();
-        System.out.println("6 Помощь   4 Резервирование  2 Выбор рейса");
+    }
+
+    @Override
+    public String toString() {
+        return "Места";
     }
 }
 
@@ -165,7 +194,10 @@ class Reserve extends State{
         System.out.println(" Эконом           ХХ");
         System.out.println(" Бизнес           ХХ");
         System.out.println();System.out.println();
-        System.out.println("6 Помощь   3 Выбор мест  5 подтверждение");
+    }
+    @Override
+    public String toString() {
+        return "Резервирование";
     }
 }
 
@@ -183,6 +215,9 @@ class Confirm extends State{
         System.out.println();System.out.println();
         System.out.println("Номер карты для оплаты   ХХXXXXX");
         System.out.println("подтверждение оплаты   ХХX");
-        System.out.println("6 Помощь   4 Резервирование  1 Начальный экран");
+    }
+    @Override
+    public String toString() {
+        return "Подтвержение";
     }
 }
