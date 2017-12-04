@@ -47,6 +47,7 @@ public class RoundBuffer<T> {
         }
         if (end == begin) {
             begin++;
+//            buffer[begin] = null; //?
             if (begin == size) {
                 begin = 0;
             }
@@ -57,6 +58,10 @@ public class RoundBuffer<T> {
     public T get() {
         if (isEmpty()) throw new IllegalStateException("Empty");
         return buffer[cursor];
+    }
+
+    public void clearRight(){
+        end = cursor;
     }
 
     public boolean isEmpty() {
@@ -98,6 +103,12 @@ class CommandQueue extends RoundBuffer<Command> {
         Command c = get();
         cPrev();
         return c;
+    }
+
+    @Override
+    public void put(Command val) {
+        clearRight();
+        super.put(val);
     }
 
     public Command getRedo() throws NoCommandException {
