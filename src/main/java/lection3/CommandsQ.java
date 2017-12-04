@@ -40,27 +40,27 @@ class CommandsQ extends ArrayList<Command> {
         cursor--;
     }
 
-    public void toNext() throws NoComandException {
+    public void toNext() throws NoCommandException {
         cursor++;
     }
 
-    public Command getC() throws NoComandException {
+    public Command getC() throws NoCommandException {
         try {
             return super.get(cursor);
         } catch (ArrayIndexOutOfBoundsException e) {
-            throw new NoComandException("Error getting command");
+            throw new NoCommandException("Error getting command");
         }
     }
 
-    public Command getToUndo() throws NoComandException {
-        if (is_first()) throw new NoComandException("Nothing to undo");
+    public Command getToUndo() throws NoCommandException {
+        if (is_first()) throw new NoCommandException("Nothing to undo");
         Command c = getC();
         toPrev();
         return c;
     }
 
-    public Command getToRedo() throws NoComandException {
-        if (is_last()) throw new NoComandException("No commands to redo");
+    public Command getToRedo() throws NoCommandException {
+        if (is_last()) throw new NoCommandException("No commands to redo");
         toNext();
         return getC();
     }

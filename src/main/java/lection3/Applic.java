@@ -65,7 +65,7 @@ public class Applic {
             if (args[0].compareTo("U") == 0) {
                 try {
                     cq.getUndo().undo();
-                } catch (NoComandException e) {
+                } catch (NoCommandException e) {
                     System.err.println(e.getMessage());
                 }
                 continue;
@@ -74,7 +74,7 @@ public class Applic {
             if (args[0].compareTo("R") == 0) {
                 try {
                     cq.getRedo().execute(ln, n, m);
-                } catch (NoComandException e) {
+                } catch (NoCommandException e) {
                     System.err.println(e.getMessage());
                 }
                 continue;
