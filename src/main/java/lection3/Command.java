@@ -1,4 +1,4 @@
-package lection3.src;
+package lection3;
 
 abstract class Command {
     protected static Lines lines;

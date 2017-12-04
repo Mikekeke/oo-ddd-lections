@@ -1,4 +1,4 @@
-package lection3.src;
+package lection3;
 
 public class Lines {
     protected String[] lines;
