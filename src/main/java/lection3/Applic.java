@@ -23,7 +23,7 @@ public class Applic {
         cmdMap.put("DL", new DeleteLine());
         cmdMap.put("RL", new ReplaceLine());
         fact = new XFactory<>(cmdMap);
-        cq = new CommandQueue(4);
+        cq = new CommandQueue(3);
     }
 
     public void exec() throws IOException {

@@ -10,8 +10,8 @@ public class RoundBuffer<T> {
     public final int size;
 
     public RoundBuffer(Class<T> cls, int size) {
-        buffer = (T[]) Array.newInstance(cls, size);
-        this.size = size;
+        this.size = size + 1;
+        buffer = (T[]) Array.newInstance(cls, this.size);
     }
 
     public int getCursor() {
@@ -20,19 +20,17 @@ public class RoundBuffer<T> {
 
     public void cPrev() {
         if (isFirst()) throw new IllegalStateException("No prev");
-        if (cursor > 0) {
-            cursor--;
-        } else {
+        cursor--;
+        if (cursor <= 0) {
             cursor = size - 1;
         }
     }
 
     public void cNext() {
         if (isLast()) throw new IllegalStateException("No next");
-        if (cursor < size) {
-            cursor++;
-        } else {
-            cursor = 0;
+        cursor++;
+        if (cursor >= size) {
+           cursor = 0;
         }
     }
 
