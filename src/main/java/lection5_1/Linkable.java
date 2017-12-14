@@ -1,4 +1,4 @@
-package lection5;
+package lection5_1;
 
 public class Linkable<E> {
     private E item;
@@ -6,6 +6,7 @@ public class Linkable<E> {
     public Linkable(Linkable<E> left, E item, Linkable<E> right){
         this.item = item;
         this.right = right;
+        this.left = left;
     }
 
     public void setItem(E item) {
@@ -30,5 +31,10 @@ public class Linkable<E> {
 
     public void setLeft(Linkable<E> left) {
         this.left = left;
+    }
+
+    @Override
+    public String toString() {
+        return item == null ? "null" : item.toString();
     }
 }
